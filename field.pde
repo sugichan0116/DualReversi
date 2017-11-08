@@ -61,6 +61,14 @@ class Field {
     return ((rule & Rule.ISVALID) == Rule.ISVALID);
   }
   
+  boolean isRuleNormal() {
+    return (isRuleValid() && (rule & Rule.ISNORMAL) == Rule.ISNORMAL);
+  }
+  
+  boolean isRuleSimple() {
+    return (isRuleValid() && (rule & Rule.ISSIMPLE) == Rule.ISSIMPLE);
+  }
+  
   boolean isRulePos() {
     return (isRuleValid() && (rule & Rule.ISPOSITION) == Rule.ISPOSITION);
   }
