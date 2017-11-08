@@ -2,7 +2,7 @@
 interface Frame {
   boolean
   CIRCLE  = false,
-  RECT = true,
+  RECT    = true,
   WHITE   = true,
   BLACK   = false; 
 }

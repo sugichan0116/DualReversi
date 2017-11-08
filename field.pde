@@ -1,15 +1,14 @@
 class Field {
-  private float x, y, r;
-  private Mass[][] mass;
-  private boolean isTurn;
+  //フィールド
+  private float x, y, r;    //盤の位置・大きさ
+  private Mass[][] mass;    //盤
+  private boolean isTurn;   //手番
+  private byte rule;        //ルール
   
+  //メソッド
+  //コンストラクタ
   Field () {
     this(8);
-    mass[3][3].deploy(false);
-    mass[4][3].deploy(true);
-    mass[3][4].deploy(true);
-    mass[4][4].deploy(false);
-    
   }
   
   Field (int Size) {
@@ -17,7 +16,7 @@ class Field {
   }
   
   Field (int Size, float x, float y, float r) {
-    if(Size < 0) return;
+    if(Size < 0) Size = 8;
     mass = new Mass[Size][Size];
     for(int n = 0; n < mass.length; n++) {
       for(int m = 0; m < mass[0].length; m++) {
@@ -25,10 +24,13 @@ class Field {
       }
     }
     
+    setRule((byte)(Rule.ISVALID | Rule.ISPOSITION));
     isTurn = false;
+    init();
     
     set(x, y, r);
   }
+  
   
   void set(float x, float y) {
     set(x, y, this.r);
@@ -40,6 +42,30 @@ class Field {
     this.r = r;
   }
   
+  void setRule(byte rule) {
+    this.rule = rule;
+  }
+  
+  void init() {
+    int[] pos = new int[]{ceil(mass.length / 2) - 1, ceil(mass.length / 2) - 1};
+    for(int n = 0; n < 2; n++) {
+      for(int m = 0; m < 2; m++) {
+        if(massID(new int[]{ pos[0] + n, pos[1] + m }) != null)
+        mass[pos[0] + n][pos[1] + m].deploy((n == m) ^ isRulePos());
+      }
+    }
+  }
+  
+  //ルール
+  boolean isRuleValid() {
+    return ((rule & Rule.ISVALID) == Rule.ISVALID);
+  }
+  
+  boolean isRulePos() {
+    return (isRuleValid() && (rule & Rule.ISPOSITION) == Rule.ISPOSITION);
+  }
+  
+  //メイン
   void draw() {
     pushMatrix();
     translate(x, y);
@@ -62,6 +88,8 @@ class Field {
     isTurn = !isTurn;
   }
   
+  //機能
+  //画面の座標からマスを計算
   int[] check(float x, float y) {
     int Row = floor((x - this.x) / r);
     int Col = floor((y - this.y) / r);
