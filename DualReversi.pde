@@ -14,9 +14,10 @@ void draw() {
   fill(0);
   textSize(24);
   textAlign(LEFT, TOP);
-  text("Turn : " + ((field.isTurn) ? "WHITE" : "BLACK") + frameKind, 0, 0);
+  text("Turn : " + ((field.isTurn) ? "WHITE" : "BLACK") + frameKind +
+    "[B" + field.getFrameNum(false) + "] vs [W" + field.getFrameNum(true) + "]", 0, 0);
   field.draw();
-  (new Mass(true, true, true)).draw(mouseX, mouseY, field.r);
+  (new Mass(true, field.isTurn, field.isTurn)).draw(mouseX, mouseY, field.r);
 }
 
 void mousePressed() {

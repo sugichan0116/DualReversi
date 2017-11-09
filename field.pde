@@ -51,7 +51,7 @@ class Field {
     for(int n = 0; n < 2; n++) {
       for(int m = 0; m < 2; m++) {
         if(massID(new int[]{ pos[0] + n, pos[1] + m }) != null)
-        mass[pos[0] + n][pos[1] + m].deploy((n == m) ^ isRulePos(), false);
+        mass[pos[0] + n][pos[1] + m].deploy((n == m) ^ isRulePos(), (n == m) ^ isRulePos());
       }
     }
   }
@@ -67,6 +67,14 @@ class Field {
   
   boolean isRuleSimple() {
     return (isRuleValid() && (rule & Rule.ISSIMPLE) == Rule.ISSIMPLE);
+  }
+  
+  boolean isRuleBlackShape() {
+    return (isRuleValid() && (rule & Rule.ISBLACK) == Rule.ISBLACK);
+  }
+  
+  boolean isRuleWhiteShape() {
+    return (isRuleValid() && (rule & Rule.ISWHITE) == Rule.ISWHITE);
   }
   
   boolean isRulePos() {
@@ -128,10 +136,18 @@ class Field {
     return false;
   }
   
+  boolean isDeployColor() {
+    return isTurn;
+  }
+  
+  boolean isDeployShape() {
+    return isTurn;
+  }
+  
   void deploy(int[] pos) {
     if(massID(pos) == null) return;
     
-    if(massID(pos).deploy(isTurn, false)) {
+    if(massID(pos).deploy(isDeployColor(), isDeployShape())) {
       for(int[] _dir: DIRECTION) {
         if(isReverse(new int[]{0}, new int[]{pos[0], pos[1]}, _dir)) 
           reverse(new int[]{pos[0], pos[1]}, _dir);
@@ -145,7 +161,8 @@ class Field {
     times[0]++;
     
     if(massID(pos) == null || !massID(pos).isExsisted()) return false;
-    if(massID(pos).isColor() != isTurn ) return isReverse(times, pos, direction);
+    if(massID(pos).isColor() != isDeployColor() || massID(pos).isShape() != isDeployShape())
+      return isReverse(times, pos, direction);
     if(times[0] <= 1) return false;
     return true;
   }
@@ -155,9 +172,9 @@ class Field {
     pos[1] += direction[1];
     
     if(massID(pos) == null || !massID(pos).isExsisted()) return;
-    if(massID(pos).isColor() == isTurn ) return;
-    if(massID(pos).isColor() != isTurn ) { 
-      massID(pos).reverse(isTurn, false);
+    if(massID(pos).isColor() == isDeployColor() && massID(pos).isShape() == isDeployShape()) return;
+    if(massID(pos).isColor() != isDeployColor() || massID(pos).isShape() != isDeployShape() ) { 
+      massID(pos).reverse(isDeployColor(), isDeployShape());
       reverse(pos, direction);
     }
     
@@ -167,6 +184,24 @@ class Field {
     if(pos.length != 2) return null;
     if(!isValid(pos[0], pos[1])) return null;
     return mass[pos[0]][pos[1]];
+  }
+  
+  boolean getShape(boolean isColor) {
+    boolean Shape = false;
+    if(isColor == Frame.BLACK) Shape = (!isRuleBlackShape()) ?  Frame.CIRCLE : Frame.RECT;
+    if(isColor == Frame.WHITE) Shape = (isRuleWhiteShape()) ?  Frame.CIRCLE : Frame.RECT;
+    return Shape;
+  }
+  
+  int getFrameNum(boolean isTurn) {
+    int Sum = 0;
+    for(Mass[] n : mass) {
+      for(Mass m : n) {
+        if(m.isExsisted() && m.Color == isTurn && m.Shape == getShape(isTurn)) Sum++;
+      }
+    }
+    
+    return Sum;
   }
   
 }
