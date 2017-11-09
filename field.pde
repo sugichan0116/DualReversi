@@ -51,7 +51,7 @@ class Field {
     for(int n = 0; n < 2; n++) {
       for(int m = 0; m < 2; m++) {
         if(massID(new int[]{ pos[0] + n, pos[1] + m }) != null)
-        mass[pos[0] + n][pos[1] + m].deploy((n == m) ^ isRulePos());
+        mass[pos[0] + n][pos[1] + m].deploy((n == m) ^ isRulePos(), false);
       }
     }
   }
@@ -77,15 +77,25 @@ class Field {
   void draw() {
     pushMatrix();
     translate(x, y);
+    rectMode(CORNER);
+    fill(32, 188, 32);
+    rect(0, 0, r * mass.length, r * mass[0].length);
+    int PointPos = 0;
+    while(PointPos * 4 <= mass.length / 2) {
+      for(int n = 0; n < 4; n++) {
+        circle(r * 2 * ((n % 2 == 0) ? (mass.length / 2 - 1 - PointPos) : (1 + PointPos)),
+          r * 2 * ((n / 2 == 0) ? (mass.length / 2 - 1 - PointPos) : (1 + PointPos)), r * 0.05);
+      }
+      PointPos++;
+    }
     for(int n = 0; n < mass.length; n++) {
       for(int m = 0; m < mass[0].length; m++) {
         noFill();
-        if(isDeploy(new int[]{n, m})) fill(128);
+        if(isDeploy(new int[]{n, m})) fill(0, 64, 0, 128);
         stroke(0);
-        rectMode(CORNER);
         rect(r * n, r * m, r, r);
         fill(128);
-        text(n + "" + m, r * n, r * m);
+        //text(n + "" + m, r * n, r * m);
         mass[n][m].draw(r * n, r * m, r);
       }
     }
@@ -121,7 +131,7 @@ class Field {
   void deploy(int[] pos) {
     if(massID(pos) == null) return;
     
-    if(massID(pos).deploy(isTurn)) {
+    if(massID(pos).deploy(isTurn, false)) {
       for(int[] _dir: DIRECTION) {
         if(isReverse(new int[]{0}, new int[]{pos[0], pos[1]}, _dir)) 
           reverse(new int[]{pos[0], pos[1]}, _dir);
@@ -147,7 +157,7 @@ class Field {
     if(massID(pos) == null || !massID(pos).isExsisted()) return;
     if(massID(pos).isColor() == isTurn ) return;
     if(massID(pos).isColor() != isTurn ) { 
-      massID(pos).reverse();
+      massID(pos).reverse(isTurn, false);
       reverse(pos, direction);
     }
     
@@ -159,6 +169,13 @@ class Field {
     return mass[pos[0]][pos[1]];
   }
   
+}
+
+void circle(float x, float y, float r) {
+  pushStyle();
+  ellipseMode(RADIUS);
+  ellipse(x, y, r, r);
+  popStyle();
 }
 
 static boolean isInRange(float a, float b, float c) {

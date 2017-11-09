@@ -1,6 +1,7 @@
 Field field;
 final static int[][] DIRECTION = new int[][]
   {{-1, -1}, {0, -1}, {1, -1}, {-1, 0}, {1, 0}, {-1, 1}, {0, 1}, {1, 1}};
+int frameKind = 0;
 
 void setup() {
   size(480, 360);
@@ -13,8 +14,9 @@ void draw() {
   fill(0);
   textSize(24);
   textAlign(LEFT, TOP);
-  text("Turn : " + ((field.isTurn) ? "WHITE" : "BLACK"), 0, 0);
+  text("Turn : " + ((field.isTurn) ? "WHITE" : "BLACK") + frameKind, 0, 0);
   field.draw();
+  (new Mass(true, true, true)).draw(mouseX, mouseY, field.r);
 }
 
 void mousePressed() {
@@ -23,4 +25,8 @@ void mousePressed() {
     field.deploy(pos);
     field.update();
   }
+}
+
+void mouseWheel() {
+  frameKind = (++frameKind) % 3;
 }
