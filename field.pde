@@ -4,6 +4,7 @@ class Field {
   private Mass[][] mass;    //盤
   private boolean isTurn;   //手番
   private byte rule;        //ルール
+  private int deployedKind;
   
   //メソッド
   //コンストラクタ
@@ -24,7 +25,7 @@ class Field {
       }
     }
     
-    setRule((byte)(Rule.ISVALID | Rule.ISPOSITION));
+    setRule((byte)(0x00));
     isTurn = false;
     init();
     
@@ -81,6 +82,15 @@ class Field {
     return (isRuleValid() && (rule & Rule.ISPOSITION) == Rule.ISPOSITION);
   }
   
+  boolean isTurn() {
+    return isTurn;
+  }
+  
+  void setFrame(int deployedFrame) {
+    
+    if(isInRange(0, deployedFrame, 2)) deployedKind = deployedFrame;
+  }      
+  
   //メイン
   void draw() {
     pushMatrix();
@@ -99,7 +109,7 @@ class Field {
     for(int n = 0; n < mass.length; n++) {
       for(int m = 0; m < mass[0].length; m++) {
         noFill();
-        if(isDeploy(new int[]{n, m})) fill(0, 64, 0, 128);
+        if(isDeploy(-1, new int[]{n, m})) fill(0, 64, 0, 128);
         stroke(0);
         rect(r * n, r * m, r, r);
         fill(128);
@@ -128,60 +138,105 @@ class Field {
          isInRange(0, y, mass[0].length - 1));
   }
   
-  boolean isDeploy(int[] pos) {
+  boolean isDeploy(int deployedFrame, int[] pos) {
+    setFrame(deployedFrame);
     if(massID(pos) == null || massID(pos).isExsisted()) return false;
     for(int[] _dir: DIRECTION) {
-      if(isReverse(new int[]{0}, new int[]{pos[0], pos[1]}, _dir)) return true;
+      if(isReverse(new int[]{pos[0], pos[1]}, _dir)) return true;
     }
     return false;
   }
   
   boolean isDeployColor() {
-    return isTurn;
+    return isDeployColor(deployedKind);
+  }
+  boolean isDeployColor(int deployedKind) {
+    return isTurn ^ (deployedKind == 2);
   }
   
   boolean isDeployShape() {
-    return isTurn;
+    return isDeployShape(deployedKind);
+  }
+  boolean isDeployShape(int deployedKind) {
+    return isTurn ^ (deployedKind == 1);
   }
   
-  void deploy(int[] pos) {
+  void deploy(int deployedFrame, int[] pos) {
+    setFrame(deployedFrame);
     if(massID(pos) == null) return;
     
     if(massID(pos).deploy(isDeployColor(), isDeployShape())) {
       for(int[] _dir: DIRECTION) {
-        if(isReverse(new int[]{0}, new int[]{pos[0], pos[1]}, _dir)) 
+        if(isReverse(new int[]{pos[0], pos[1]}, _dir)) 
           reverse(new int[]{pos[0], pos[1]}, _dir);
       }
     }
   }
   
-  boolean isReverse(int[] times, int[] pos, final int[] direction) {
+  boolean isReverse(int[] pos, final int[] direction) {
+    return isReverseColor(new int[]{0}, new int[]{pos[0], pos[1]}, direction) || 
+           isReverseShape(new int[]{0}, new int[]{pos[0], pos[1]}, direction);
+  }
+  
+  boolean isReverseColor(int[] times, int[] pos, final int[] direction) {
     pos[0] += direction[0];
     pos[1] += direction[1];
     times[0]++;
     
     if(massID(pos) == null || !massID(pos).isExsisted()) return false;
-    if(massID(pos).isColor() != isDeployColor() || massID(pos).isShape() != isDeployShape())
-      return isReverse(times, pos, direction);
+    if(massID(pos).isColor() != isDeployColor())
+      return isReverseColor(times, pos, direction);
+    if(times[0] <= 1) return false;
+    return true;
+  }
+  
+  boolean isReverseShape(int[] times, int[] pos, final int[] direction) {
+    pos[0] += direction[0];
+    pos[1] += direction[1];
+    times[0]++;
+    
+    if(massID(pos) == null || !massID(pos).isExsisted()) return false;
+    if(massID(pos).isShape() != isDeployShape())
+      return isReverseShape(times, pos, direction);
     if(times[0] <= 1) return false;
     return true;
   }
   
   void reverse(int[] pos, final int[] direction) {
+    if(isReverseColor(new int[]{0}, new int[]{pos[0], pos[1]}, direction))
+      reverseColor(new int[]{pos[0], pos[1]}, direction);
+    if(isReverseShape(new int[]{0}, new int[]{pos[0], pos[1]}, direction))
+      reverseShape(new int[]{pos[0], pos[1]}, direction);
+  }
+  
+  void reverseColor(int[] pos, final int[] direction) {
     pos[0] += direction[0];
     pos[1] += direction[1];
     
     if(massID(pos) == null || !massID(pos).isExsisted()) return;
-    if(massID(pos).isColor() == isDeployColor() && massID(pos).isShape() == isDeployShape()) return;
-    if(massID(pos).isColor() != isDeployColor() || massID(pos).isShape() != isDeployShape() ) { 
-      massID(pos).reverse(isDeployColor(), isDeployShape());
-      reverse(pos, direction);
+    if(massID(pos).isColor() == isDeployColor()) return;
+    if(massID(pos).isColor() != isDeployColor()) { 
+      massID(pos).reverseColor();
+      reverseColor(pos, direction);
+    }
+    
+  }
+  
+  void reverseShape(int[] pos, final int[] direction) {
+    pos[0] += direction[0];
+    pos[1] += direction[1];
+    
+    if(massID(pos) == null || !massID(pos).isExsisted()) return;
+    if(massID(pos).isShape() == isDeployShape()) return;
+    if(massID(pos).isShape() != isDeployShape() ) { 
+      massID(pos).reverseShape();
+      reverseShape(pos, direction);
     }
     
   }
   
   Mass massID(int[] pos) {
-    if(pos.length != 2) return null;
+    if(pos == null || pos.length != 2) return null;
     if(!isValid(pos[0], pos[1])) return null;
     return mass[pos[0]][pos[1]];
   }

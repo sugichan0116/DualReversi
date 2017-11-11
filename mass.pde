@@ -25,15 +25,19 @@ class Mass {
     popStyle();
   }
   
-  void reverse(boolean Color, boolean Shape) {
-    this.Color = Color;
-    this.Shape = Shape;
+  void reverseColor() {
+    Color = !Color;
+  }
+  
+  void reverseShape() {
+    Shape = !Shape;
   }
   
   boolean deploy(boolean Color, boolean Shape) {
     if(isExsist) return false;
     
-    reverse(Color, Shape);
+    this.Color = Color;
+    this.Shape = Shape;
     return isExsist = true;
   }
   
