@@ -20,7 +20,7 @@ class Mass {
       ellipse(x + r / 2f, y + r / 2f, r * 0.8f, r * 0.8f);
     }else if(Shape == Frame.RECT) {
       rectMode(CENTER);
-      rect(x + r / 2f, y + r / 2f, r * 0.6f, r * 0.6f);
+      rect(x + r / 2f, y + r / 2f, r * 0.7f, r * 0.7f);
     }
     popStyle();
   }
