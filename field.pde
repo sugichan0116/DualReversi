@@ -97,6 +97,7 @@ class Field {
     translate(x, y);
     rectMode(CORNER);
     fill(32, 188, 32);
+    strokeWeight(1f * rateY);
     rect(0, 0, r * mass.length, r * mass[0].length);
     int PointPos = 0;
     while(PointPos * 4 <= mass.length / 2) {
@@ -148,16 +149,16 @@ class Field {
   }
   
   boolean isDeployColor() {
-    return isDeployColor(deployedKind);
+    return isDeployColor(isTurn, deployedKind);
   }
-  boolean isDeployColor(int deployedKind) {
+  boolean isDeployColor(boolean isTurn, int deployedKind) {
     return isTurn ^ (deployedKind == 2);
   }
   
   boolean isDeployShape() {
-    return isDeployShape(deployedKind);
+    return isDeployShape(isTurn, deployedKind);
   }
-  boolean isDeployShape(int deployedKind) {
+  boolean isDeployShape(boolean isTurn, int deployedKind) {
     return isTurn ^ (deployedKind == 1);
   }
   
