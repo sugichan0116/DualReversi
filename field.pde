@@ -116,6 +116,7 @@ class Field {
         fill(128);
         //text(n + "" + m, r * n, r * m);
         mass[n][m].draw(r * n, r * m, r);
+        mass[n][m].update();
       }
     }
     popMatrix();
@@ -251,6 +252,7 @@ class Field {
   
   int getFrameNum(boolean isTurn) {
     int Sum = 0;
+    if(mass == null) return -1;
     for(Mass[] n : mass) {
       for(Mass m : n) {
         if(m.isExsisted() && m.Color == isTurn && m.Shape == getShape(isTurn)) Sum++;

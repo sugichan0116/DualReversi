@@ -4,10 +4,10 @@ final static int[][] DIRECTION = new int[][]
 int frameKind = 0;
 float rateX, rateY;
 int[][] frameNum;
-int Scale = 8;
+int Scale = 6;
 
 void setup() {
-  fullScreen();
+  fullScreen(P3D);
   //size(480, 360);
   rateX = (float)width / 480f;
   rateY = (float)height / 360f;
@@ -29,30 +29,36 @@ void draw() {
   fill(255);
   field.draw();
   (new Mass(true, field.isDeployColor(field.isTurn, frameKind), field.isDeployShape(field.isTurn, frameKind))).draw(mouseX - field.r / 2, mouseY - field.r / 2, field.r);
-  if(field.getFrameNum(false) + field.getFrameNum(true) != 0)
-  //rect(0, height, width * (float)field.getFrameNum(false) / (float)(field.getFrameNum(false) + field.getFrameNum(true)), -12);
   pushStyle();
   for(int m = 0; m < 2; m++) {
     float menuWidth = (width - height) / 2;
     pushMatrix();
-    translate(width / 2, height / 2);
+    translate(width / 2, height / 2, 0f);
     if(m == 1) rotate(PI);
     for(int n = 0; n < 3; n++) {
       fill((m == 1) ? 0 : 255);
       if(field.isTurn() ^ (m == 0) && frameKind == n) fill(128);
-      circle(height / 2 + menuWidth / 2 , height * 0.2 * (n), min(field.r * 0.7, (menuWidth - 8 * rateY) / 2));
+        circle(height / 2 + menuWidth / 2 , height * 0.2 * (n), min(field.r * 0.7, (menuWidth - 8 * rateY) / 2));
       stroke((m == 1) ? 255 : 0);
-      (new Mass(true, field.isDeployColor((m == 1), n), field.isDeployShape((m == 1), n))).draw(height / 2 + menuWidth / 2 - field.r / 2, height * 0.2 * (n) - field.r / 2, field.r);
+        (new Mass(true, field.isDeployColor((m == 1), n), field.isDeployShape((m == 1), n))).
+          draw(height / 2 + menuWidth / 2 -  min(field.r, menuWidth * 0.8f) / 2,
+          height * 0.2 * (n) - min(field.r, menuWidth * 0.8f) / 2,
+          min(field.r, menuWidth * 0.8f));
       fill((m == 1) ? 255 : 0);
       stroke((m == 1) ? 0 : 255);
-      circle(height / 2 + menuWidth / 2 + menuWidth * 0.2, height * 0.2 * (n + 0.2), min(field.r * 0.3, menuWidth / 4));
+        pushMatrix();
+        translate(0f, 0f, 6f * rateY);
+        circle(height / 2 + menuWidth / 2 + menuWidth * 0.2, height * 0.2 * (n + 0.2), min(field.r * 0.3, menuWidth / 4));
+        popMatrix();
       fill((m == 1) ? 0 : 255);
       textAlign(CENTER, CENTER);
       textSize(min(field.r * 0.3, menuWidth / 4));
-      text(frameNum[(field.isTurn() ^ (m == 0)) ? 1 : 0][n], height / 2 + menuWidth / 2 + menuWidth * 0.2, height * 0.2 * (n + 0.2));
+        text(frameNum[((m == 0)) ? 1 : 0][n],
+          height / 2 + menuWidth / 2 + menuWidth * 0.2,
+          height * 0.2 * (n + 0.2), 6f * rateY);
     }
-    textSize(min(field.r * 2, menuWidth));
-    text(field.getFrameNum((m == 1)), height / 2 + menuWidth / 2, height * -0.3, 12 * rateY);
+    textSize(int(min(field.r * 2, menuWidth)));
+      text(field.getFrameNum((m == 1)), height / 2 + menuWidth / 2, height * -0.3, 0f);
     popMatrix();
   }
   popStyle();
@@ -61,7 +67,7 @@ void draw() {
 void mousePressed() {
   int[] pos = field.check(mouseX, mouseY);
   if(pos != null && field.isDeploy(frameKind, pos) && frameNum[(field.isTurn()) ? 1 : 0][frameKind] > 0) {
-    frameNum[(field.isTurn()) ? 1 : 0][frameKind]--;
+    frameNum[(field.isTurn()) ? 0 : 1][frameKind]--;
     field.deploy(frameKind, pos);
     field.update();
   }
