@@ -29,6 +29,7 @@ void draw() {
   fill(255);
   field.draw();
   (new Mass(true, field.isDeployColor(field.isTurn, frameKind), field.isDeployShape(field.isTurn, frameKind))).draw(mouseX - field.r / 2, mouseY - field.r / 2, field.r);
+
   pushStyle();
   for(int m = 0; m < 2; m++) {
     float menuWidth = (width - height) / 2;
@@ -66,7 +67,7 @@ void draw() {
 
 void mousePressed() {
   int[] pos = field.check(mouseX, mouseY);
-  if(pos != null && field.isDeploy(frameKind, pos) && frameNum[(field.isTurn()) ? 1 : 0][frameKind] > 0) {
+  if(pos != null && field.isDeploy(frameKind, pos) && frameNum[(field.isTurn()) ? 0 : 1][frameKind] > 0) {
     frameNum[(field.isTurn()) ? 0 : 1][frameKind]--;
     field.deploy(frameKind, pos);
     field.update();

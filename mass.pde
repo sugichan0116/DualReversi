@@ -1,6 +1,8 @@
 class Mass {
   private boolean isExsist, Shape, Color;
-  int rot;
+  private int rot;
+  private int[] rotDirection;
+  private boolean rotColor, rotShape;
   
   Mass() {
     this(false, false, false);
@@ -11,18 +13,22 @@ class Mass {
     this.Color = Color;
     this.Shape = Shape;
     rot = 0;
+    rotDirection = new int[]{0, 0};
+    rotColor = rotShape = false;
   }
   
   public void draw(float x, float y, float r) {   
     if(!isExsist) return;
     pushStyle();
-    fill((Color == Frame.BLACK) ? 0 : 255);
-    if(Shape == Frame.CIRCLE) {
+    fill(((rot > 90) ? rotColor == Frame.BLACK : Color == Frame.BLACK) ? 0 : 255);
+    if((rot > 90) ? rotShape == Frame.CIRCLE : Shape == Frame.CIRCLE) {
       //ellipseMode(CENTER);
       //ellipse(x + r / 2f, y + r / 2f, r * 0.8f, r * 0.8f);
       pushMatrix();
         translate(x + r / 2f, y + r / 2f, r * 0.5f * abs(sin(radians(rot))));
-        rotateY(radians(rot));
+        rotateX(float(rotDirection[1]) * radians(rot) / 2);
+        rotateY(float(-rotDirection[0]) * radians(rot) / 2);
+        //rotateZ(radians(rot) / 2);
         int poly = 32;
         for(int m = 0; m < 2; m++) {
           beginShape();
@@ -43,12 +49,14 @@ class Mass {
           endShape();  
         }
       popMatrix();
-    }else if(Shape == Frame.RECT) {
+    }else if((rot > 90) ? rotShape == Frame.RECT : Shape == Frame.RECT) {
       //rectMode(CENTER);
       //rect(x + r / 2f, y + r / 2f, r * 0.7f, r * 0.7f);
       pushMatrix();
         translate(x + r / 2f, y + r / 2f, r * 0.5f * abs(sin(radians(rot))));
-        rotateY(radians(rot));
+        rotateX(float(rotDirection[1]) * radians(rot) / 2);
+        rotateY(float(-rotDirection[0]) * radians(rot) / 2);
+        //rotateZ(radians(rot) / 2);
         box(r * 0.7f, r * 0.7f, r * 0.1f);
       popMatrix();
     }
@@ -56,15 +64,26 @@ class Mass {
   }
   
   void update() {
-    rot = max(0, rot - 4);
+    rot = max(0, rot - 1);
+    if(rot == 0) {
+      rotColor = Color;
+      rotShape = Shape;
+    }
+  }
+  
+  void setReverseDirection(int[] direction) {
+    if(direction == null || direction.length != 2) return;
+    rotDirection = direction;
   }
   
   void reverseColor() {
+    rotColor = Color;
     Color = !Color;
     rot = 180;
   }
   
   void reverseShape() {
+    rotShape = Shape;
     Shape = !Shape;
     rot = 180;
   }

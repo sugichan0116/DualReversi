@@ -4,6 +4,7 @@ class Field {
   private Mass[][] mass;    //盤
   private boolean isTurn;   //手番
   private byte rule;        //ルール
+  private byte isGame;        //
   private int deployedKind;
   
   //メソッド
@@ -86,6 +87,10 @@ class Field {
     return isTurn;
   }
   
+  void setIsTurn(boolean isTurn) {
+    this.isTurn = isTurn;
+  }
+  
   void setFrame(int deployedFrame) {
     
     if(isInRange(0, deployedFrame, 2)) deployedKind = deployedFrame;
@@ -124,10 +129,20 @@ class Field {
   
   void update() {
     isTurn = !isTurn;
+    if(isGame == WinLose.NONE) {
+      if(isDeploy()) isTurn = !isTurn;
+      if(isDeploy()) jedgeGame();
+    }
   }
   
   //機能
   //画面の座標からマスを計算
+  void jedgeGame() {
+    if(getFrameNum(false) > getFrameNum(true)) isGame = WinLose.BLACK;
+    if(getFrameNum(false) < getFrameNum(true)) isGame = WinLose.WHITE;
+    if(getFrameNum(false) == getFrameNum(true)) isGame = WinLose.EVEN;
+  }
+  
   int[] check(float x, float y) {
     int Row = floor((x - this.x) / r);
     int Col = floor((y - this.y) / r);
@@ -218,6 +233,7 @@ class Field {
     if(massID(pos) == null || !massID(pos).isExsisted()) return;
     if(massID(pos).isColor() == isDeployColor()) return;
     if(massID(pos).isColor() != isDeployColor()) { 
+      massID(pos).setReverseDirection(direction);
       massID(pos).reverseColor();
       reverseColor(pos, direction);
     }
@@ -231,6 +247,7 @@ class Field {
     if(massID(pos) == null || !massID(pos).isExsisted()) return;
     if(massID(pos).isShape() == isDeployShape()) return;
     if(massID(pos).isShape() != isDeployShape() ) { 
+      massID(pos).setReverseDirection(direction);
       massID(pos).reverseShape();
       reverseShape(pos, direction);
     }
@@ -256,6 +273,22 @@ class Field {
     for(Mass[] n : mass) {
       for(Mass m : n) {
         if(m.isExsisted() && m.Color == isTurn && m.Shape == getShape(isTurn)) Sum++;
+      }
+    }
+    
+    return Sum;
+  }
+  
+  boolean isDeploy() {
+    return (getCanDeployNum(0) == 0) && (getCanDeployNum(1) == 0) && (getCanDeployNum(2) == 0);
+  }
+  
+  int getCanDeployNum(int frameKind) {
+    int Sum = 0;
+    if(mass == null) return -1;
+    for(int n = 0; n < mass.length; n++) {
+      for(int m = 0; m < mass.length; m++) {
+        if(isDeploy(frameKind, new int[]{n, m})) Sum++;
       }
     }
     
