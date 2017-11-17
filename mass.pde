@@ -26,8 +26,8 @@ class Mass {
       //ellipse(x + r / 2f, y + r / 2f, r * 0.8f, r * 0.8f);
       pushMatrix();
         translate(x + r / 2f, y + r / 2f, r * 0.5f * abs(sin(radians(rot))));
-        rotateX(float(rotDirection[1]) * radians(rot) / 2);
-        rotateY(float(-rotDirection[0]) * radians(rot) / 2);
+        rotateX(float(rotDirection[1]) * radians(rot));
+        rotateY(float(-rotDirection[0]) * radians(rot));
         //rotateZ(radians(rot) / 2);
         int poly = 32;
         for(int m = 0; m < 2; m++) {
@@ -54,8 +54,8 @@ class Mass {
       //rect(x + r / 2f, y + r / 2f, r * 0.7f, r * 0.7f);
       pushMatrix();
         translate(x + r / 2f, y + r / 2f, r * 0.5f * abs(sin(radians(rot))));
-        rotateX(float(rotDirection[1]) * radians(rot) / 2);
-        rotateY(float(-rotDirection[0]) * radians(rot) / 2);
+        rotateX(float(rotDirection[1]) * radians(rot));
+        rotateY(float(-rotDirection[0]) * radians(rot));
         //rotateZ(radians(rot) / 2);
         box(r * 0.7f, r * 0.7f, r * 0.1f);
       popMatrix();
@@ -64,7 +64,7 @@ class Mass {
   }
   
   void update() {
-    rot = max(0, rot - 1);
+    rot = max(0, rot - 4);
     if(rot == 0) {
       rotColor = Color;
       rotShape = Shape;

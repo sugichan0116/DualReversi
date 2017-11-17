@@ -129,8 +129,8 @@ class Field {
   
   void update() {
     isTurn = !isTurn;
-    if(isGame == WinLose.NONE) {
-      if(isDeploy()) isTurn = !isTurn;
+    if(isGame == WinLose.NONE || isGame == WinLose.PASS) {
+      if(isDeploy()) { isGame = WinLose.PASS; isTurn = !isTurn; }
       if(isDeploy()) jedgeGame();
     }
   }

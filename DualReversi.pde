@@ -46,6 +46,7 @@ void draw() {
           height * 0.2 * (n) - min(field.r, menuWidth * 0.8f) / 2,
           min(field.r, menuWidth * 0.8f));
       fill((m == 1) ? 255 : 0);
+      if(frameNum[((m == 0)) ? 1 : 0][n] == 0) fill(196, 0, 0);
       stroke((m == 1) ? 0 : 255);
         pushMatrix();
         translate(0f, 0f, 6f * rateY);
@@ -61,6 +62,26 @@ void draw() {
     textSize(int(min(field.r * 2, menuWidth)));
       text(field.getFrameNum((m == 1)), height / 2 + menuWidth / 2, height * -0.3, 0f);
     popMatrix();
+  }
+  popStyle();
+  
+  pushStyle();
+  textSize(72 * rateY);
+  textAlign(CENTER, CENTER);
+  switch(field.isGame) {
+    case WinLose.PASS:
+      text("PASS !", width / 2, height / 2, 10f * rateY);
+      break;
+    case WinLose.EVEN:
+      text("EVEN...", width / 2, height / 2, 10f * rateY);
+      break;
+    case WinLose.BLACK:
+      text("BLACK WIN !", width / 2, height / 2, 10f * rateY);
+      break;
+    case WinLose.WHITE:
+      text("WHITE WIN !", width / 2, height / 2, 10f * rateY);
+      break;
+    
   }
   popStyle();
 }

@@ -1,7 +1,8 @@
 interface WinLose {
   byte
   NONE    = 0,
-  EVEN    = 1,
-  BLACK   = 2,
-  WHITE   = 3;
+  PASS    = 1,
+  EVEN    = 2,
+  BLACK   = 3,
+  WHITE   = 4;
 }
